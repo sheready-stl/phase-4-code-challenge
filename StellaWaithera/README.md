@@ -1,130 +1,260 @@
-# Object Relations Code Challenge - Concerts
+# Rails Code Challenge - Superheroes
 
-For this assignment, we'll be working with a Concert domain.
+For this assessment, you'll be working on an API for tracking heroes and their
+superpowers.
 
-We have three models: `Band`, `Concert`, and `Venue`.
+In this repo, there is a Rails application with some features built out. There
+is also a fully built React frontend application, so you can test if your API is
+working.
 
-For our purposes, a `Band` has many `Concerts`, a `Venue` has many `Concerts`s, and a `Concert` belongs to a `Band` and to a `Venue`.
+Your job is to build out the Rails API to add the functionality described in the
+deliverables below.
 
-`Band` - `Venue` is a many to many relationship.
+## Setup
 
-**Note**: You should draw your domain on paper or on a whiteboard _before you start coding_. Remember to identify a single source of truth for your data.
+To download the dependencies for the frontend and backend, run:
 
-## Topics
+```sh
+bundle install
+npm install --prefix client
+```
 
-- Classes and Instances
-- Class and Instance Methods
-- Variable Scope
-- Object Relationships
-- Arrays and Array Methods
+There is some starter code in the `db/seeds.rb` file so that once you've
+generated the models, you'll be able to create data to test your application.
 
-## Instructions
+You can run your Rails API on [`localhost:3000`](http://localhost:3000) by running:
 
-To get started, run `bundle install` while inside of this directory.
+```sh
+rails s
+```
 
-Build out all of the methods listed in the deliverables. The methods are listed in a suggested order, but you can feel free to tackle the ones you think are easiest. Be careful: some of the later methods rely on earlier ones.
+You can run your React app on [`localhost:4000`](http://localhost:4000) by running:
 
-**Remember!** This code challenge does not have tests. You cannot run `rspec` and you cannot run `learn`. You'll need to create your own sample instances so that you can try out your code on your own. Make sure your associations and methods work in the console before submitting.
+```sh
+npm start --prefix client
+```
 
-We've provided you with a tool that you can use to test your code. To use it, run `ruby tools/console.rb` from the command line. This will start a `pry` session with your classes defined. You can test out the methods that you write here. You can add code to the `tools/console.rb` file to define variables and create sample instances of your objects.
+You are not being assessed on React, and you don't have to update any of the React
+code; the frontend code is available just so that you can test out the behavior
+of your API in a realistic setting.
 
-Writing error-free code is more important than completing all of the deliverables listed - prioritize writing methods that work over writing more methods that don't work. You should test your code in the console as you write.
+There are also tests included which you can run using `rspec` to check your work.
 
-Similarly, messy code that works is better than clean code that doesn't. First, prioritize getting things working. Then, if there is time at the end, refactor your code to adhere to best practices. Examples of best practices might be to use higher-level array methods such as `map`, `select`, and `find` when appropriate in place of `each`, or, when you encounter duplicated logic, to extract it into a shared helper method.
+Depending on your preference, you can either check your progress by:
 
-**Before you submit!** Save and run your code to verify that it works as you expect. If you have any methods that are not working yet, feel free to leave comments describing your progress.
+- Running `rspec` and seeing if your code passes the tests
+- Running the React application in the browser and interacting with the API via
+  the frontend
+- Running the Rails server and using Postman to make requests
 
-## Deliverables
+## Models
 
-Write the following methods in the classes in the files provided. Feel free to build out any helper methods if needed.
+You need to create the following relationships:
 
-Deliverables use the notation `#` for instance methods, and `.` for class methods.
+- A `Hero` has many `Power`s through `HeroPower`
+- A `Power` has many `Hero`s through `HeroPower`
+- A `HeroPower` belongs to a `Hero` and belongs to a `Power`
 
-Some of the methods listed are provided to you in the starter code. You should check that they work correctly, and that you understand them.
+Start by creating the models and migrations for the following database tables:
 
-### Initializers, Readers, and Writers
+![domain diagram](domain.png)
 
-#### Band
+If you use a Rails generator to create the models, make sure to use the
+`--no-test-framework` flag to avoid overwriting the test files.
 
-- `Band#initialize(name, hometown)`
-  - should initialize with a name (string) and hometown (string)
-- `Band#name`
-  - should return the `Band`'s name
-  - should be able to change its name after creation
-- `Band#hometown`
-  - should return the `Band`'s hometown
-  - should not be able to change its hometown after creation
-- `Band.all`
-  - returns an array of all the instances of `Band`
+Add any code needed in the model files to establish the relationships.
 
-#### Venue
+Then, run the migrations and seed file:
 
-- `Venue#initialize(title, city)`
-  - should initialize with a title (string) and city (string)
-- `Venue#title`
-  - should return the title of the venue
-  - should be able to change its title after creation
-- `Venue#city`
-  - should return the city of the venue
-  - should not be able to change its city after creation
-- `Venue.all`
-  - returns all the instances of `Venue`
+```sh
+rails db:migrate db:seed
+```
 
-#### Concert
+> If you aren't able to get the provided seed file working, you are welcome to
+> generate your own seed data to test the application.
 
-- `Concert#initialize(date, band, venue)`
-  - should initialize with a date (string), band, and venue
-- `Concert.all`
-  - should return all instances of `Concert`
+## Validations
 
-### Object Relationship Methods
+Add validations to the `HeroPower` model:
 
-#### Concert
+- `strength` must be one of the following values: 'Strong', 'Weak', 'Average'
 
-- `Concert#band`
-  - should return the `Band` instance for this concert
-- `Concert#venue`
-  - should return the `Venue` instance for this concert
+Add validations to the `Power` model:
 
-#### Venue
+- `description` must be present and at least 20 characters long
 
-- `Venue#concerts`
-  - returns an array of all the concerts for the venue
-- `Venue#bands`
-  - returns an array of all the bands for the venue
+## Routes
 
-#### Band
+Set up the following routes. Make sure to return JSON data in the format
+specified along with the appropriate HTTP verb.
 
-- `Band#concerts`
-  - should return an array of all the concerts that the band has played in
+### GET /heroes
 
-### Aggregate and Association Methods
+Return JSON data in the format below:
 
-#### Concert
+```json
+[
+  { "id": 1, "name": "Kamala Khan", "super_name": "Ms. Marvel" },
+  { "id": 2, "name": "Doreen Green", "super_name": "Squirrel Girl" },
+  { "id": 3, "name": "Gwen Stacy", "super_name": "Spider-Gwen" }
+]
+```
 
-- `Concert#hometown_show?`
-  - returns `true` if the concert is in the band's hometown, `false` if it is not
-- `Concert#introduction`
-  - returns a string with the band's introduction for this concert
-  - an introduction is in the form: `"Hello {insert city name here}!!!!!, we are {insert band name here} and we're from {insert hometown here}"`
+### GET /heroes/:id
 
-#### Band
+If the `Hero` exists, return JSON data in the format below:
 
-- `Band#play_in_venue(venue, date)`
-  - takes a venue and date (as a string) as arguments, and creates a new concert for the band in that venue on that date
-- `Band#all_introductions`
-  - returns an array of strings representing all the introductions for this band
-  - each introduction is in the form `"Hello {insert city name here}!!!!!, we are {insert band name here} and we're from {insert hometown here}"`
+```json
+{
+  "id": 1,
+  "name": "Kamala Khan",
+  "super_name": "Ms. Marvel",
+  "powers": [
+    {
+      "id": 1,
+      "name": "super strength",
+      "description": "gives the wielder super-human strengths"
+    },
+    {
+      "id": 2,
+      "name": "flight",
+      "description": "gives the wielder the ability to fly through the skies at supersonic speed"
+    }
+  ]
+}
+```
 
-#### Venue
+If the `Hero` does not exist, return the following JSON data, along with
+the appropriate HTTP status code:
 
-- `Venue#concert_on(date)`
-  - takes a date (string) as argument
-  - finds and returns the first concert on that date at that venue
-  - if there is no concert on that date at that venue, returns `nil`
-- `Venue#most_frequent_band`
-  - returns the band with the most concerts at the venue
+```json
+{
+  "error": "Hero not found"
+}
+```
 
-## Rubric
+### GET /powers
 
-You can find the rubric for this assessment [here](https://github.com/learn-co-curriculum/se-rubrics/blob/master/module-1.md).
+Return JSON data in the format below:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "super strength",
+    "description": "gives the wielder super-human strengths"
+  },
+  {
+    "id": 1,
+    "name": "flight",
+    "description": "gives the wielder the ability to fly through the skies at supersonic speed"
+  }
+]
+```
+
+### GET /powers/:id
+
+If the `Power` exists, return JSON data in the format below:
+
+```json
+{
+  "id": 1,
+  "name": "super strength",
+  "description": "gives the wielder super-human strengths"
+}
+```
+
+If the `Power` does not exist, return the following JSON data, along with
+the appropriate HTTP status code:
+
+```json
+{
+  "error": "Power not found"
+}
+```
+
+### PATCH /powers/:id
+
+This route should update an existing `Power`. It should accept an object with
+the following properties in the body of the request:
+
+```json
+{
+  "description": "Updated description"
+}
+```
+
+If the `Power` exists and is updated successfully (passes validations), update
+its description and return JSON data in the format below:
+
+```json
+{
+  "id": 1,
+  "name": "super strength",
+  "description": "Updated description"
+}
+```
+
+If the `Power` does not exist, return the following JSON data, along with
+the appropriate HTTP status code:
+
+```json
+{
+  "error": "Power not found"
+}
+```
+
+If the `Power` is **not** updated successfully (does not pass validations),
+return the following JSON data, along with the appropriate HTTP status code:
+
+```json
+{
+  "errors": ["validation errors"]
+}
+```
+
+### POST /hero_powers
+
+This route should create a new `HeroPower` that is associated with an
+existing `Power` and `Hero`. It should accept an object with the following
+properties in the body of the request:
+
+```json
+{
+  "strength": "Average",
+  "power_id": 1,
+  "hero_id": 3
+}
+```
+
+If the `HeroPower` is created successfully, send back a response with the data
+related to the `Hero`:
+
+```json
+{
+  "id": 1,
+  "name": "Kamala Khan",
+  "super_name": "Ms. Marvel",
+  "powers": [
+    {
+      "id": 1,
+      "name": "super strength",
+      "description": "gives the wielder super-human strengths"
+    },
+    {
+      "id": 2,
+      "name": "flight",
+      "description": "gives the wielder the ability to fly through the skies at supersonic speed"
+    }
+  ]
+}
+```
+
+If the `HeroPower` is **not** created successfully, return the following
+JSON data, along with the appropriate HTTP status code:
+
+```json
+{
+  "errors": ["validation errors"]
+}
+```
